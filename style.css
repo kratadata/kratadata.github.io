@@ -1,0 +1,210 @@
+/* color can be changed only in root. numbers according to images */
+:root {
+    --1:red;
+    --2:green;
+    --3:red;
+    --4:red;
+    --5:red;
+    --6:yellow;
+
+}
+
+
+
+
+body {
+    margin: 0;
+    padding: 0;
+    background-color: rgb(156, 156, 156); 
+    font-family: 'Overpass', sans-serif;
+}
+@import url('https://fonts.googleapis.com/css2?family=Overpass:ital,wght@0,200;0,400;0,700;1,900&display=swap');
+header {
+    padding-left:  2em ;
+    line-height: .6em;
+    padding-bottom: 3em;
+
+}
+li {
+    list-style: none;
+    font-size: .7em;
+    color: rgb(214, 214, 214);
+
+}
+h1 {
+    font-size: 4em;
+    color: rgb(26, 26, 26);
+    font-weight: 900;
+    margin: 1em 0 .5em;
+
+}
+h2 {
+    /*margin: 2em 0 2em 0;*/
+    /*padding-left:1em;*/
+    text-align: center;
+}
+
+h3{
+    position: absolute;
+    top:21em;
+    padding-left: 2em  ;
+    font-size: small;
+    font-style: italic;
+    color: rgb(63, 63, 63); 
+}
+li.color{
+    font-size: 1.8em ;
+    color: black;
+}
+p{
+ /*font-size: .8em;*/
+ text-align: center;
+ font-size: 16px;
+ text-shadow: .4px .4px 0px #cecece;
+ font-weight: 200;
+ font-variant: small-caps;
+}
+.angry{
+    display: inline-table;
+    margin: .2em;
+    padding-left:1em ;
+    background-color: #e81c2b       ;
+    height: 1em;
+    width: 160px;
+    border-radius: 10px;
+
+}
+.suprise{
+    display: inline-table;
+    margin: .2em;
+    padding-left: 1em;
+    background-color: #eace2a                   ;
+    height: 1em;
+    width: 160px;
+    border-radius: 10px;
+
+}   
+.fear{
+    display: inline-table;
+    margin: .2em;
+    padding-left: 1em;
+    background-color: #6a3499                               ;
+    height: 1em;
+    width: 160px;
+    border-radius: 10px;
+
+}   
+.disgust{
+    display: inline-table;
+    margin: .2em;
+    padding-left: 1em;
+    background-color: #6d340d                                           ;
+    height: 1em;
+    width: 160px;
+    border-radius: 10px;
+
+}   
+.sad{
+    display: inline-table;
+    margin: .2em;
+    padding-left: 1em;
+    background-color: #459fe3                                           ;
+    height: 1em;
+    width: 160px;
+    border-radius: 10px;
+
+}   
+
+.container {
+    display: none;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 2em;
+    padding: 3em;
+}
+
+/*
+.reactions {
+    position:relative;
+    left:10%;
+    height: 600px; 
+    width: 600px; 
+    overflow: hidden;
+}   
+*/
+
+.reactions {
+    display: block;
+    margin-left: 30%;
+    margin-right: 20%;
+    width: 600px;
+    height: 600px;
+}
+
+
+
+img {
+    height: 600px;
+    width: 100%;
+    object-fit: cover;
+}
+
+img:hover {
+    opacity: 0.3;
+    transition: .17s;
+
+}
+#overlay1 {
+    background-color: var(--1) ;
+    overflow: hidden;
+    border-radius: 30px;
+
+}
+#overlay2 {
+    background-color: var(--2) ;
+    overflow: hidden;
+    border-radius: 30px;
+
+}
+#overlay3 {
+    background-color: var(--3) ;
+    overflow: hidden;
+    border-radius: 30px;
+
+}
+#overlay4 {
+    background-color: var(--4) ;
+    overflow: hidden;
+    border-radius: 30px;
+
+}
+#overlay5 {
+    background-color: var(--5) ;
+    overflow: hidden;
+    border-radius: 30px;
+
+}
+#overlay6 {
+    background-color: var(--6) ;
+    overflow: hidden;
+    border-radius: 30px;
+
+}
+
+
+
+.button{border: none;
+                color: white;
+                padding: 15px 32px;
+                text-align: center;
+                text-decoration: none;
+                display: inline-block;
+                font-size: 16px;
+                margin: 4px 2px;
+                cursor: pointer;
+                background-color: #4CAF50; /* Green */
+                display: block;
+                margin-left: auto;
+                margin-right: auto;
+                width: 100%;
+                height: 10%;
+                }

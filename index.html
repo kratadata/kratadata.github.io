@@ -1,0 +1,369 @@
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Emotional Reaction</title>
+    <link rel="stylesheet" href="/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@2.4.0/dist/tf.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/face-landmarks-detection@0.0.1/dist/face-landmarks-detection.js"></script>
+</head>
+
+<body>
+ 
+
+ <!-- 
+    <header>
+
+
+        <div class="text">
+            <ul>
+                <li>
+                    <h1>Emotional Response</h1>
+                </li>
+                <li>
+                    <h2>A Project by: Hanh-Dung Nguyen, Naël Prélaz, Paulina Zybinska, Otto Kolless</h2>
+                </li>
+                <li class="color">
+                    <div class="angry">
+                        <p>angry</p>
+                    </div>
+                    <div class="suprise">
+                        <p>suprise</p>
+                    </div>
+                    <div class="fear">
+                        <p>fear</p>
+                    </div>
+                    <div class="disgust">
+                        <p>disgust</p>
+                    </div>
+                    <div class="sad">
+                        <p>sad</p>
+                    </div>
+                </li>
+            </ul>
+        </div>
+
+
+    </header>
+-->
+
+    
+
+
+<!--        <h3>hover over any image</h3>  -->
+        <br>
+        <div class="reactions" id="reactions">
+            <div class ="fitImage">
+                <img id="reactionImage" src="images/intro.png">
+                <img src="images/react_1_spider.png" style="display: none">
+                <img src="images/react_2_trump.png" style="display: none">
+                <img src="images/react_3_headline.png" style="display: none">
+                <img src="images/react_4_fish.png" style="display: none">
+                <img src="images/react_5_bird.png" style="display: none">
+                <button class="button" id="button" type="button" onclick="change()">Start</button>
+                <h2 id="status" >Wait for the model to load...</h2>
+            </div>
+        </div>
+
+        
+    
+    <canvas id="output"></canvas>
+
+    <video id="webcam" playsinline style="
+            /*visibility: hidden;*/
+            width: 300px;
+            height: auto;
+            ">
+    </video>
+
+
+
+
+
+    <div class="container" id="imageGrid">
+        <div id="overlay1">
+            <img src="images/react_1_spider.png" alt="">
+            <p id="poverlay1"></p>
+        </div>
+        <div id="overlay2">
+            <img src="images/react_2_trump.png" alt="">
+            <p id="poverlay2"></p>
+        </div>
+        <div id="overlay3">
+            <img src="images/react_3_headline.png" alt="">
+            <p id="poverlay3"></p>
+        </div>
+        <div id="overlay4">
+            <img src="images/react_4_fish.png" alt="">
+            <p id="poverlay4"></p>
+        </div>
+        <div id="overlay5">
+            <img src="images/react_5_bird.png" alt="">
+            <p id="poverlay4"></p>
+        </div>
+        <div id="overlay6">
+            <img src="images/react_6_skate.png" alt="">
+            <p id="poverlay6"></p>
+        </div>
+
+    </div>
+
+
+
+
+
+
+
+
+    <script>
+        function setText(text) {
+            document.getElementById("status").innerText = text;
+        }
+
+        function drawLine(ctx, x1, y1, x2, y2) {
+            ctx.beginPath();
+            ctx.moveTo(x1, y1);
+            ctx.lineTo(x2, y2);
+            ctx.stroke();
+        }
+
+        async function setupWebcam() {
+            return new Promise((resolve, reject) => {
+                const webcamElement = document.getElementById("webcam");
+                const navigatorAny = navigator;
+                navigator.getUserMedia = navigator.getUserMedia ||
+                    navigatorAny.webkitGetUserMedia || navigatorAny.mozGetUserMedia ||
+                    navigatorAny.msGetUserMedia;
+                if (navigator.getUserMedia) {
+                    navigator.getUserMedia({ video: true },
+                        stream => {
+                            webcamElement.srcObject = stream;
+                            webcamElement.addEventListener("loadeddata", resolve, false);
+                        },
+                        error => reject());
+                }
+                else {
+                    reject();
+                }
+            });
+        }
+
+        const emotions = ["angry", "disgust", "fear", "happy", "neutral", "sad", "surprise"];
+        let emotionModel = null;
+        let currentEmotion = "neutral";
+
+        let output = null;
+        let model = null;
+
+        async function predictEmotion(points) {
+            let result = tf.tidy(() => {
+                const xs = tf.stack([tf.tensor1d(points)]);
+                return emotionModel.predict(xs);
+            });
+            let prediction = await result.data();
+            result.dispose();
+            // Get the index of the maximum value
+            let id = prediction.indexOf(Math.max(...prediction));
+            return emotions[id];
+        }
+
+        async function trackFace() {
+            const video = document.querySelector("video");
+            const faces = await model.estimateFaces({
+                input: video,
+                returnTensors: false,
+                flipHorizontal: false,
+            });
+            output.drawImage(
+                video,
+                0, 0, video.width, video.height,
+                0, 0, video.width, video.height
+            );
+
+            let points = null;
+            faces.forEach(face => {
+                // Draw the bounding box
+                const x1 = face.boundingBox.topLeft[0];
+                const y1 = face.boundingBox.topLeft[1];
+                const x2 = face.boundingBox.bottomRight[0];
+                const y2 = face.boundingBox.bottomRight[1];
+                const bWidth = x2 - x1;
+                const bHeight = y2 - y1;
+                drawLine(output, x1, y1, x2, y1);
+                drawLine(output, x2, y1, x2, y2);
+                drawLine(output, x1, y2, x2, y2);
+                drawLine(output, x1, y1, x1, y2);
+
+                // Add just the nose, cheeks, eyes, eyebrows & mouth
+                const features = [
+                    "noseTip",
+                    "leftCheek",
+                    "rightCheek",
+                    "leftEyeLower1", "leftEyeUpper1",
+                    "rightEyeLower1", "rightEyeUpper1",
+                    "leftEyebrowLower", //"leftEyebrowUpper",
+                    "rightEyebrowLower", //"rightEyebrowUpper",
+                    "lipsLowerInner", //"lipsLowerOuter",
+                    "lipsUpperInner", //"lipsUpperOuter",
+                ];
+                points = [];
+                features.forEach(feature => {
+                    face.annotations[feature].forEach(x => {
+                        points.push((x[0] - x1) / bWidth);
+                        points.push((x[1] - y1) / bHeight);
+                    });
+                });
+            });
+
+            if (points) {
+                let emotion = await predictEmotion(points);
+                setText(`Detected: ${emotion}`);
+
+                currentEmotion = emotion;
+/*
+                setInterval(function () {
+                    currentEmotion = emotion;
+                    localStorage.setItem("CurrentEmotion", currentEmotion);
+                }, 3000);
+                console.log(currentEmotion);
+*/                
+            }
+            else {
+                setText("No Face");
+            }
+
+            requestAnimationFrame(trackFace);
+        }
+
+        (async () => {
+            await setupWebcam();
+            const video = document.getElementById("webcam");
+            video.play();
+            let videoWidth = video.videoWidth;
+            let videoHeight = video.videoHeight;
+            video.width = videoWidth;
+            video.height = videoHeight;
+
+            
+            let canvas = document.getElementById("output");
+            canvas.width = video.width;
+            canvas.height = video.height;
+
+            output = canvas.getContext("2d");
+            output.translate(canvas.width, 0);
+            output.scale(-1, 1); // Mirror cam
+            output.canvas.hidden = true;
+            output.fillStyle = "#fdffb6";
+            output.strokeStyle = "#fdffb6";
+            output.lineWidth = 2;
+            output.canvas.hidden=true;
+           
+            // Load Face Landmarks Detection
+            model = await faceLandmarksDetection.load(
+                faceLandmarksDetection.SupportedPackages.mediapipeFacemesh
+            );
+            // Load Emotion Detection
+            emotionModel = await tf.loadLayersModel('web/model/facemo.json');
+
+            setText("Loaded!");
+
+            trackFace();
+        })();
+
+
+
+
+
+
+        var images = [];
+
+        images[0] = ['images/react_1_spider.png'];
+        images[1] = ['images/react_2_trump.png'];
+        images[2] = ['images/react_3_headline.png'];
+        images[3] = ['images/react_4_fish.png'];
+        images[4] = ['images/react_5_bird.png'];
+        images[5] = ['images/react_6_skate.png'];
+        var index = 0;
+
+        let colormap = new Map();
+            colormap.set('surprise', 'yellow');
+            colormap.set('fear', 'purple');
+            colormap.set('disgust', 'brown');
+            colormap.set('happy', 'green');
+            colormap.set('sad', 'blue');
+            colormap.set('angry', 'red');
+            colormap.set('neutral', 'grey');
+
+        var caughtColormotion = 'neutral';
+
+
+        let imageset = [];
+
+
+        function change() {
+            document.getElementById("reactionImage").src = images[index];
+            if (index == 6) {
+                var slider = document.getElementById("reactions");
+                var grid = document.getElementById("imageGrid");
+
+                slider.style.display = "none";
+                wait(2000);
+                grid.style.display = "inline-grid";
+
+                buildResults();
+
+            } else {
+                caughtColormotion = colormap.get(currentEmotion);
+//                console.log(caughtColormotion);
+                imageset[index] = caughtColormotion;
+//                console.log(imageset);
+                index++;
+            }
+         setTimeout(change, 2500);
+        }
+
+
+
+
+        function wait(ms){
+            var start = new Date().getTime();
+            var end = start;
+            while(end < start + ms) {
+                end = new Date().getTime();
+            }
+        }
+
+
+        function getKey(value) {
+            return [...colormap].find(([key, val]) => val == value)[0]
+        }
+
+
+        function buildResults(){
+            for(var i=0; i<imageset.length; i++){
+                    let j = i + 1;
+                    var overlay = document.getElementById("overlay"+j);
+                    overlay.style.backgroundColor = imageset[i];
+
+                    var poverlay = document.getElementById("poverlay"+j);
+                    poverlay.innerText = getKey(imageset[i]);
+                    //var p = document.createTextNode(getKey(imageset[i]));
+                    //overlay.appendChild(p);
+                }
+
+
+        }
+
+
+
+
+    </script>
+
+
+
+
+</body>
+
+</html>

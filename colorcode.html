@@ -1,0 +1,50 @@
+<html>
+    <head>
+    <title>Emotions</title>
+    </head>
+    <body>
+   
+    <h1 id="emotion" ></h1>
+
+<script>
+     setInterval(function get() {
+        var current = localStorage.getItem("CurrentEmotion")
+        document.getElementById("emotion").textContent = `${current}`;
+        console.log(current);
+        
+
+        if (current == "surprise") {
+            document.body.style.backgroundColor = "yellow";
+            
+        } else if (current == "fear") {
+             document.body.style.backgroundColor = "purple";
+        
+        } else if (current == "disgust") {
+             document.body.style.backgroundColor = "brown";
+      
+        } else if (current == "happy") {
+             document.body.style.backgroundColor = "green";
+        
+        } else if (current == "sad") {
+             document.body.style.backgroundColor = "blue";
+
+        } else if (current == "angry") {
+             document.body.style.backgroundColor = "red";
+
+        } else {
+            document.body.style.backgroundColor = "grey";
+        }
+
+
+
+        return get;
+    }(), 3000);      
+
+
+
+</script>
+    
+
+
+</body>
+</html>
