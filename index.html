@@ -138,6 +138,8 @@
             ctx.lineTo( x3, y3 );
             ctx.lineTo( x1, y1 );
             ctx.stroke();
+            ctx.strokeStyle = 'white';
+            ctx.lineWidth = 1;
         }
 
 
@@ -259,6 +261,7 @@
             let videoHeight = video.videoHeight;
             video.width = videoWidth;
             video.height = videoHeight;
+            video.style.display = "none";
 
             
             let canvas = document.getElementById("output");
@@ -268,7 +271,6 @@
             output = canvas.getContext("2d");
             output.translate(canvas.width, 0);
             output.scale(-1, 1); // Mirror cam
-            //output.canvas.hidden = true;
             output.fillStyle = "#fdffb6";
             output.strokeStyle = "#fdffb6";
             output.lineWidth = 2;
