@@ -195,6 +195,7 @@
 
             let points = null;
             faces.forEach(face => {
+
                 // Draw the bounding box
                 const x1 = face.boundingBox.topLeft[0];
                 const y1 = face.boundingBox.topLeft[1];
@@ -229,6 +230,7 @@
                     "lipsLowerInner", //"lipsLowerOuter",
                     "lipsUpperInner", //"lipsUpperOuter",
                 ];
+
                 points = [];
                 features.forEach(feature => {
                     face.annotations[feature].forEach(x => {
@@ -240,18 +242,8 @@
 
             if (points) {
                 let emotion = await predictEmotion(points);
-                //setText(`Detected: ${emotion}`);
-
                 currentEmotion = emotion;
-/*
-                setInterval(function () {
-                    currentEmotion = emotion;
-                    localStorage.setItem("CurrentEmotion", currentEmotion);
-                }, 3000);
-                console.log(currentEmotion);
-*/                
-            }
-            else {
+            } else {
                 setText("No Face");
             }
 
@@ -275,7 +267,7 @@
             output = canvas.getContext("2d");
             output.translate(canvas.width, 0);
             output.scale(-1, 1); // Mirror cam
-            output.canvas.hidden = true;
+            //output.canvas.hidden = true;
             output.fillStyle = "#fdffb6";
             output.strokeStyle = "#fdffb6";
             output.lineWidth = 2;
